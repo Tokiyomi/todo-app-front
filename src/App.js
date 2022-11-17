@@ -13,9 +13,9 @@ function App() {
       <ButtonAppBar></ButtonAppBar>
       <ControlBar></ControlBar>
       <AddTodoButton></AddTodoButton>
+      <Student></Student>
       <DenseTable></DenseTable>
       <BasicPagination></BasicPagination>
-      <Student></Student>
     </div>
   );
 }
