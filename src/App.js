@@ -5,6 +5,7 @@ import ControlBar from './components/Appcontrol';
 import AddTodoButton from './components/Appaddtodo';
 import BasicPagination from './components/Apppagination';
 import DenseTable from './components/Apptodotable';
+import Student from './components/Apptodolist';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <AddTodoButton></AddTodoButton>
       <DenseTable></DenseTable>
       <BasicPagination></BasicPagination>
+      <Student></Student>
     </div>
   );
 }
