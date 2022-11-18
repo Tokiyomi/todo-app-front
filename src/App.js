@@ -12,9 +12,9 @@ function App() {
     <div className="App">
       <ButtonAppBar></ButtonAppBar>
       <ControlBar></ControlBar>
-      <AddTodoButton></AddTodoButton>
-      <Student></Student>
-      <DenseTable></DenseTable>
+      {/*<AddTodoButton></AddTodoButton>*/}
+      {/*<Student></Student>*/}
+      {/*<DenseTable></DenseTable>*/}
       <BasicPagination></BasicPagination>
     </div>
   );

@@ -2,16 +2,15 @@ import * as React from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
+import { Container ,Paper,Button} from '@mui/material';
 
 
 import InputLabel from '@mui/material/InputLabel';
 
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
-import Paper from '@mui/material/Paper';
+
 
 //import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -20,20 +19,50 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 export default function ControlBar() {
-    const paperStyle={padding:'50px 20px', width:600,margin:"20px auto"}
+    const paperStyle={padding:'20px 20px', width:600,margin:"20px auto"}
     const [priority, setPriority] = React.useState('LOW');
     const [flag, setFlag] = React.useState('UNDONE');
     const [creationdate, setCreationDatetime] = React.useState(new Date());
     const [duedate, setDueDate] = React.useState(null);
     const [donedate, setDoneDate] = React.useState(null);
+    const[content,setContent]=React.useState('')
+    const[todos,setTodo]=React.useState([])
     
-    const handleChange_priority = (event) => {
+    /*const handleChange_priority = (event) => {
         setPriority(event.target.value);
     };
 
     const handleChange_flag = (event) => {
         setFlag(event.target.value);
     };
+
+    const handleChange_content = (event) => {
+        setContent(event.target.value);
+    };*/
+
+    const handleClick=(e)=>{
+        e.preventDefault()
+        const todo={content,priority,flag,duedate,creationdate}
+        console.log(todo)
+        fetch("http://localhost:9090/todos",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify(todo)
+    
+      }).then(()=>{
+        console.log("New todo added")
+      })
+    }
+    
+    React.useEffect(()=>{
+      fetch("http://localhost:9090/todos", {
+        method:"GET"
+      })
+      .then(res=>res.json())
+      .then((result)=>{ setTodo(result);
+      }
+    )
+    },[])
 
     const Item = styled(Paper)(({ theme }) => ({
         backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -44,24 +73,16 @@ export default function ControlBar() {
       }));
 
     return (
+        <Container>
         <Paper sx={{ my: 2 }} style={paperStyle}>
-            <h1 style={{color:"blue"}}><u>Add Todo</u></h1>
+            <h1 style={{color:"blue"}}>Add Todo</h1>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <TextField id="outlined-basic" required label="Todo Content" variant="outlined" fullWidth />
-            <div>
-                <DesktopDatePicker
-                label="Creation Date"
-                disabled
-                readOnly
-                value={creationdate}
-                onChange={(newValue) => {
-                    setCreationDatetime(newValue);
-                }}
-                renderInput={(params) => <TextField {...params} sx={{width: '30%'}} /> }
-                />
-            </div>
-            <div>
-                
+            
+            <TextField id="outlined-basic" label="Todo name" variant="outlined" fullWidth 
+            value={content}
+            onChange={(e)=>setContent(e.target.value)}/>
+            
+            <div style={{padding:'15px 0px', textAlign:'left'}}>       
                 <FormControl fullWidth>
                 <InputLabel id="demo-simple-select-readonly-label">Priority</InputLabel>
                 <Select
@@ -71,18 +92,32 @@ export default function ControlBar() {
                 id="demo-simple-select"
                 value={priority}
                 label="Priority"
-                
-                onChange={handleChange_priority}
+                //onChange={handleChange_priority}
+                onChange={(e)=>setPriority(e.target.value)}
                 >
                     <MenuItem value={"LOW"}>LOW</MenuItem>
                     <MenuItem value={"MEDIUM"}>MEDIUM</MenuItem>
                     <MenuItem value={"HIGH"}>HIGH</MenuItem>
                 </Select>
                 </FormControl>
-                
+            </div>         
+            <div style={{padding:'8px 0px', textAlign:'left'}}>
+                <DesktopDatePicker
+                label="Creation Date"
+                disabled
+                readOnly
+                value={creationdate}
+                onChange={(newValue) => {
+                    setCreationDatetime(newValue);
+                }}
+                renderInput={(params) => <TextField {...params} /> } // sx={{width: '35%'}}
+                />
+            </div>
+            <div style={{padding:'8px 0px', textAlign:'left'}}>
                 <DateTimePicker sx={{ my: 2 }}
-                    renderInput={(params) => <TextField {...params} sx={{width: '30%'}}/>}
+                    renderInput={(params) => <TextField {...params} />} // sx={{width: '35%'}}
                     label="Due Date (Optional)"
+                    //format="dd/MM/yyyy"
                     value={duedate}
                     onChange={(newValue) => {
                     setDueDate(newValue);
@@ -90,19 +125,23 @@ export default function ControlBar() {
                     //renderInput={(params) => <TextField {...params} helperText="Optional"/>}
                 />
             </div>
-            
-            
-            
+            <div style={{padding:'15px 0px', textAlign:'left'}}>
+            <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-readonly-label">Status</InputLabel>
             <Select 
                 labelId="demo-simple-select-label-2"
                 id="demo-simple-select-2"
                 value={flag}
                 label="Status"
-                onChange={handleChange_flag}
+                //onChange={handleChange_flag}
+                onChange={(e)=>setFlag(e.target.value)}
             >
                 <MenuItem value={"UNDONE"}>UNDONE</MenuItem>
                 <MenuItem value={"DONE"}>DONE</MenuItem>
             </Select>
+            </FormControl>
+            </div>
+            <div style={{padding:'8px 0px', textAlign:'left'}}>
             <DateTimePicker
             label="Done Date"
             disabled
@@ -112,11 +151,35 @@ export default function ControlBar() {
             }}
             renderInput={(params) => <TextField {...params} />}
             />
+            </div>
             </LocalizationProvider>
-            <Button variant="contained">Add Todo</Button>
-    
+            <div style={{padding:'15px 0px'}}>
+            <Button variant="contained" onClick={handleClick}>Add New Todo</Button>
+            </div>
+        </Paper> 
+        <Paper style={{padding:'20px 20px', width:600,margin:"20px auto"}}>
+        <h1>Todo's List</h1>
+
+        
+
+        {todos.map(todo=>(
+            <Paper elevation={6} style={{margin:"10px",padding:"15px", textAlign:"left"}} key={todo.id}>
+            Id:{todo.id}<br/>
+            Content:{todo.content}<br/>
+            Done:{todo.flag}<br/>
+            Priority:{todo.priority}<br/>
+            Creation Date:{todo.creation_date}<br/>
+            Due Date:{todo.due_date}<br/>
+            Done Date:{todo.done_date}
+
+            </Paper>
+        
+        ))
+    }
+
+
         
         </Paper>
-        
+        </Container>
     );
   }
