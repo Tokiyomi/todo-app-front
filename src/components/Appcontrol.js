@@ -5,6 +5,8 @@ import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import { Container ,Paper,Button} from '@mui/material';
 
+import axios from 'axios';
+
 
 import InputLabel from '@mui/material/InputLabel';
 
@@ -18,15 +20,17 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
+import TodosList from './Apptodos';
+
 export default function ControlBar() {
-    const paperStyle={padding:'20px 20px', width:600,margin:"20px auto"}
+    const paperStyle={padding:'20px 20px', margin:"20px auto"}
     const [priority, setPriority] = React.useState('LOW');
     const [flag, setFlag] = React.useState('UNDONE');
     const [creationdate, setCreationDatetime] = React.useState(new Date());
     const [duedate, setDueDate] = React.useState(null);
-    const [donedate, setDoneDate] = React.useState(null);
+    //const [donedate, setDoneDate] = React.useState(null);
     const[content,setContent]=React.useState('')
-    const[todos,setTodo]=React.useState([])
+    //const[todos,setTodo]=React.useState([])
     
     /*const handleChange_priority = (event) => {
         setPriority(event.target.value);
@@ -40,7 +44,7 @@ export default function ControlBar() {
         setContent(event.target.value);
     };*/
 
-    const handleClick=(e)=>{
+    /*const handleClick=(e)=>{
         e.preventDefault()
         const todo={content,priority,flag,duedate,creationdate}
         console.log(todo)
@@ -52,9 +56,9 @@ export default function ControlBar() {
       }).then(()=>{
         console.log("New todo added")
       })
-    }
+    }*/
     
-    React.useEffect(()=>{
+    /*React.useEffect(()=>{
       fetch("http://localhost:9090/todos", {
         method:"GET"
       })
@@ -62,7 +66,41 @@ export default function ControlBar() {
       .then((result)=>{ setTodo(result);
       }
     )
-    },[])
+    },[])*/
+    
+    const handleClick2=(e)=>{
+        e.preventDefault()
+        const todo={content,priority,flag,duedate,creationdate}
+        console.log(todo)
+        axios
+            .post('http://localhost:9090/todos',todo)
+            .then(TodosList.fetchData)
+            //.then(response => todo.innerHTML = response.data.id )
+        /*fetch("http://localhost:9090/todos",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify(todo)
+    
+      }).then(()=>{
+        console.log("New todo added")
+      })*/
+    }
+
+    /*const fetchData = () => {
+            //e.preventDefault()
+        //React.useEffect(() => {
+            console.log('effect')
+            axios
+              .get('http://localhost:9090/todos')
+              .then(response => {
+                console.log('promise fulfilled')
+                setTodo(response.data)
+              })
+        //}, [])
+    }*/
+    
+
+    //React.useEffect(() => fetchData(), []);
 
     const Item = styled(Paper)(({ theme }) => ({
         backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -75,7 +113,7 @@ export default function ControlBar() {
     return (
         <Container>
         <Paper sx={{ my: 2 }} style={paperStyle}>
-            <h1 style={{color:"blue"}}>Add Todo</h1>
+            {/*<h1 style={{color:"blue"}}>Add Todo</h1>*/}
             <LocalizationProvider dateAdapter={AdapterDayjs}>
             
             <TextField id="outlined-basic" label="Todo name" variant="outlined" fullWidth 
@@ -101,7 +139,7 @@ export default function ControlBar() {
                 </Select>
                 </FormControl>
             </div>         
-            <div style={{padding:'8px 0px', textAlign:'left'}}>
+            {/*<div style={{padding:'8px 0px', textAlign:'left'}}>
                 <DesktopDatePicker
                 label="Creation Date"
                 disabled
@@ -112,7 +150,7 @@ export default function ControlBar() {
                 }}
                 renderInput={(params) => <TextField {...params} /> } // sx={{width: '35%'}}
                 />
-            </div>
+            </div>*/}
             <div style={{padding:'8px 0px', textAlign:'left'}}>
                 <DateTimePicker sx={{ my: 2 }}
                     renderInput={(params) => <TextField {...params} />} // sx={{width: '35%'}}
@@ -120,12 +158,12 @@ export default function ControlBar() {
                     //format="dd/MM/yyyy"
                     value={duedate}
                     onChange={(newValue) => {
-                    setDueDate(newValue);
+                    setDueDate(new Date(newValue));
                     }}
                     //renderInput={(params) => <TextField {...params} helperText="Optional"/>}
                 />
             </div>
-            <div style={{padding:'15px 0px', textAlign:'left'}}>
+            {/*<div style={{padding:'15px 0px', textAlign:'left'}}>
             <FormControl fullWidth>
             <InputLabel id="demo-simple-select-readonly-label">Status</InputLabel>
             <Select 
@@ -151,13 +189,19 @@ export default function ControlBar() {
             }}
             renderInput={(params) => <TextField {...params} />}
             />
-            </div>
+        </div>*/}
             </LocalizationProvider>
             <div style={{padding:'15px 0px'}}>
-            <Button variant="contained" onClick={handleClick}>Add New Todo</Button>
+            <Button variant="contained" 
+            onClick={
+                handleClick2
+              }
+            >Add New Todo</Button>
+            
+            
             </div>
         </Paper> 
-        <Paper style={{padding:'20px 20px', width:600,margin:"20px auto"}}>
+        {/*<Paper style={{padding:'20px 20px', width:600,margin:"20px auto"}}>
         <h1>Todo's List</h1>
 
         
@@ -179,7 +223,7 @@ export default function ControlBar() {
 
 
         
-        </Paper>
+</Paper>*/}
         </Container>
     );
   }
