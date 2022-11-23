@@ -7,10 +7,26 @@ import axios from 'axios';
 import { styled } from '@mui/material/styles';
 
 //export const fetchData = () => {}
+
 export default function TodosList() {
     const[todos,setTodo]=React.useState([])
+    //const[change, setChange]=React.useState(false)
 
     const fetchData = () => {
+      //e.preventDefault()
+    //React.useEffect(() => {
+      console.log('effect')
+      axios
+        .get('http://localhost:9090/todos')
+        .then(response => {
+          console.log('promise fulfilled')
+          setTodo(response.data)
+        })
+      //setChange((prevState) => !prevState);
+    //}, [])
+    }
+
+    /*const fetchData = () => {
             //e.preventDefault()
         //React.useEffect(() => {
             console.log('effect')
@@ -20,11 +36,12 @@ export default function TodosList() {
                 console.log('promise fulfilled')
                 setTodo(response.data)
               })
+            //setChange((prevState) => !prevState);
         //}, [])
-    }
+    }*/
     
-
-    React.useEffect(() => fetchData(), []);
+    //fetchData();
+    React.useEffect( () => fetchData, []);
 
     const Item = styled(Paper)(({ theme }) => ({
         backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',

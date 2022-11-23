@@ -14,26 +14,24 @@ import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
 
 
-//import dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-import { useCallback } from 'react'
+
 import TodosList from './Apptodos';
 
-export default function ControlBar() {
-    //setTodos ={TodosList.setTodo}
-
+export default function ControlBarOrigial() {
     const paperStyle={padding:'20px 20px', margin:"20px auto"}
     const [priority, setPriority] = React.useState('LOW');
     const [flag, setFlag] = React.useState('UNDONE');
     const [creationdate, setCreationDatetime] = React.useState(new Date());
     const [duedate, setDueDate] = React.useState(null);
-    //const [donedate, setDoneDate] = React.useState(null);
+    const [donedate, setDoneDate] = React.useState(null);
     const[content,setContent]=React.useState('')
-    const[temp,setTemp]=React.useState([])
-    //const [change, setChange] = React.useState(false);
+    const[todos,setTodo]=React.useState([])
+    //const[change,setChange]=React.useState(false)
     
     /*const handleChange_priority = (event) => {
         setPriority(event.target.value);
@@ -70,15 +68,14 @@ export default function ControlBar() {
       }
     )
     },[])*/
-    const handleClick2=()=>{
-        //e.preventDefault()
+    
+    const handleClick2= (e)=>{
+        e.preventDefault()
         const todo={content,priority,flag,duedate,creationdate}
         console.log(todo)
         axios
             .post('http://localhost:9090/todos',todo)
-            .then(setTemp(todo))
-        //setChange((prevState) => !prevState);
-        
+            .then(fetchData)
             //.then(response => todo.innerHTML = response.data.id )
         /*fetch("http://localhost:9090/todos",{
           method:"POST",
@@ -89,10 +86,8 @@ export default function ControlBar() {
         console.log("New todo added")
       })*/
     }
-    React.useEffect(() => TodosList.fetchData, [temp]);
-    //React.useEffect(() => TodosList.fetchData(), [change]);
 
-    /*const fetchData = () => {
+    const fetchData = () => {
             //e.preventDefault()
         //React.useEffect(() => {
             console.log('effect')
@@ -103,10 +98,10 @@ export default function ControlBar() {
                 setTodo(response.data)
               })
         //}, [])
-    }*/
+    }
     
 
-    
+    React.useEffect(() => fetchData(), []);
 
     const Item = styled(Paper)(({ theme }) => ({
         backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -119,7 +114,7 @@ export default function ControlBar() {
     return (
         <Container>
         <Paper sx={{ my: 2 }} style={paperStyle}>
-            {/*<h1 style={{color:"blue"}}>Add Todo</h1>*/}
+            <h1 style={{color:"blue"}}>Add Todo</h1>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
             
             <TextField id="outlined-basic" label="Todo name" variant="outlined" fullWidth 
@@ -164,7 +159,7 @@ export default function ControlBar() {
                     //format="dd/MM/yyyy"
                     value={duedate}
                     onChange={(newValue) => {
-                    setDueDate(new Date(newValue));
+                    setDueDate(new Date(newValue).toUTCString());
                     }}
                     //renderInput={(params) => <TextField {...params} helperText="Optional"/>}
                 />
@@ -202,12 +197,10 @@ export default function ControlBar() {
             onClick={
                 handleClick2
               }
-            >Add New Todo</Button>
-            
-            
+            >Add New Todo</Button>           
             </div>
         </Paper> 
-        {/*<Paper style={{padding:'20px 20px', width:600,margin:"20px auto"}}>
+        <Paper style={{padding:'20px 20px', width:600,margin:"20px auto"}}>
         <h1>Todo's List</h1>
 
         
@@ -220,6 +213,7 @@ export default function ControlBar() {
             Priority:{todo.priority}<br/>
             Creation Date:{todo.creation_date}<br/>
             Due Date:{todo.due_date}<br/>
+            Due Date:{duedate}<br/>
             Done Date:{todo.done_date}
 
             </Paper>
@@ -229,7 +223,7 @@ export default function ControlBar() {
 
 
         
-</Paper>*/}
+</Paper>
         </Container>
     );
   }

@@ -9,7 +9,7 @@ import AppBar from '@mui/material/AppBar';
 
 import ControlBar from './Appcontrol';
 
-import TodosList, {fetchData} from './Apptodos';
+import TodosList from './Apptodos';
 
 const style = {
   position: 'absolute',
@@ -24,17 +24,17 @@ const style = {
 };
 
 export default function BasicModal() {
-  const reload=()=>window.location.reload();
+  //const reload=()=>window.location.reload();
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => {setOpen(false);  reload();};
+  const handleClose = () => {setOpen(false)};//reload();
 
   return (
     <div>
       <Button onClick={handleOpen}>Open modal</Button>
       <Modal
         open={open}
-        onClose={handleClose}
+        //onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
