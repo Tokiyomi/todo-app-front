@@ -26,7 +26,7 @@ const rows = [
 export default function DenseTable() {
   return (
     <TableContainer component={Paper} sx={{ my: 2 }}>
-      <Table  >
+      <Table size="small" >
         <TableHead>
           <TableRow>
             <TableCell>Check</TableCell>

@@ -238,7 +238,7 @@ export default function ControlBarOrigial() {
         </Modal>
         
         <TableContainer component={Paper} sx={{ my: 2 }}>
-        <Table  >  
+        <Table  size="small" >  
             <TableHead
               //numSelected={selected.length}
               //order={order}
