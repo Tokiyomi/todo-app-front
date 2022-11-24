@@ -6,6 +6,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Checkbox from '@mui/material/Checkbox';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { IconButton } from '@mui/material';
 
 function createData(name, calories, fat, carbs, protein) {
   return { name, calories, fat, carbs, protein };
@@ -22,14 +26,14 @@ const rows = [
 export default function DenseTable() {
   return (
     <TableContainer component={Paper} sx={{ my: 2 }}>
-      <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+      <Table  >
         <TableHead>
           <TableRow>
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-            <TableCell align="right">Protein&nbsp;(g)</TableCell>
+            <TableCell>Check</TableCell>
+            <TableCell >Todo Name</TableCell>
+            <TableCell align="right">Priority</TableCell>
+            <TableCell align="right">Due Date</TableCell>
+            <TableCell align="right">Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -39,12 +43,19 @@ export default function DenseTable() {
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell component="th" scope="row">
-                {row.name}
+                <Checkbox />
               </TableCell>
-              <TableCell align="right">{row.calories}</TableCell>
+              <TableCell>{row.calories}</TableCell>
               <TableCell align="right">{row.fat}</TableCell>
               <TableCell align="right">{row.carbs}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
+              <TableCell align="right">
+                <IconButton>
+                  <EditIcon/>
+                </IconButton>
+                <IconButton>
+                  <DeleteIcon/>
+                </IconButton>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

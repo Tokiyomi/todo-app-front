@@ -20,7 +20,7 @@ function App() {
       {/*<AddTodoButton></AddTodoButton>*/}
       {/*<Student></Student>*/}
       {/*<DenseTable></DenseTable>*/}
-      <BasicPagination></BasicPagination>
+      
     </div>
   );
 }
