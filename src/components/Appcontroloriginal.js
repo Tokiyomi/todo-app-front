@@ -7,6 +7,10 @@ import { Container ,Paper,Button, TableFooter} from '@mui/material';
 import SortIcon from '@mui/icons-material/Sort';
 import TablePagination from '@mui/material/TablePagination';
 import BasicPagination from './Apppagination';
+import Pagination from '@mui/material/Pagination';
+import Menu from '@mui/material/Menu';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import ImportExportIcon from '@mui/icons-material/ImportExport';
 
 import DenseTable from './Apptodotable';
 
@@ -47,18 +51,55 @@ export default function ControlBarOrigial() {
     const paperStyle={padding:'20px 20px', margin:"20px auto"}
     const [priority, setPriority] = React.useState('LOW');
     const [flag, setFlag] = React.useState('UNDONE');
-    const [searchpriority, setSearchPriority] = React.useState('ALL');
-    const [searchflag, setSearchFlag] = React.useState('ALL');
+    const [searchpriority, setSearchPriority] = React.useState('all');
+    const [searchflag, setSearchFlag] = React.useState('all');
     const [searchcontent, setSearchContent] = React.useState('');
     const [creationdate, setCreationDatetime] = React.useState(new Date());
     const [duedate, setDueDate] = React.useState(null);
     const [donedate, setDoneDate] = React.useState(null);
     const[content,setContent]=React.useState('')
     const[todos,setTodo]=React.useState([])
+    
+    //const [getcontent, setGetContent] = React.useState('none')
+    const [orden, setOrden]=React.useState('default')
+    const [page, setPage]=React.useState(1)
+    //const [getflag, setGetFlag] = React.useState('all')
+    //const [getpriority, setGetPriority] = React.useState('all')
 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
-    const handleClose = () => {setOpen(false)};//reload(); 
+    const handleClose = () => {setOpen(false)};//reload();
+    
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const openmenu = Boolean(anchorEl);
+    const handleClickMenu = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleCloseMenu = () => {
+        setAnchorEl(null);
+    };
+
+    const [asc, setAsc] = React.useState(false)
+    const handleClickArrow = () => {
+        setAsc(!asc)
+        //console.log(asc)
+    }
+    ;
+
+    const [show, setShow] = React.useState(false)
+    const showAll = () => {
+        setSearchContent('');
+        setSearchFlag('all');
+        setSearchPriority('all');
+        //fetchData();
+        setShow(!show)
+    };
+
+    React.useEffect(() => {
+        fetchData();
+    }, [show]);
+
+    const [contentError, setContentError] = React.useState(false);
 
     const style = {
         position: 'absolute',
@@ -79,15 +120,32 @@ export default function ControlBarOrigial() {
         axios
             .post('http://localhost:9090/todos',todo)
             .then(fetchData)
+            .then(setContentError(false))
+            .catch(function (error) {
+                console.error(error.response.data['validation message']['Invalid content']);
+                setContentError(true);
+              })
     }
 
     const fetchData = () => {
             console.log('effect')
             axios
-              .get('http://localhost:9090/todos')
+              .get('http://localhost:9090/todos', 
+              { params: 
+              { orden: orden, 
+                content:searchcontent, 
+                page : page, 
+                flag: searchflag, 
+                priority:searchpriority, 
+                asc:asc } }
+                )
               .then(response => {
                 console.log('promise fulfilled')
-                setTodo(response.data)
+                //console.log(response.data.items)
+                setTodo(response.data.items)
+              })
+              .catch(function (error) {
+                console.error(error);
               })
     }
     
@@ -126,7 +184,7 @@ export default function ControlBarOrigial() {
                     <MenuItem value={"LOW"}>LOW</MenuItem>
                     <MenuItem value={"MEDIUM"}>MEDIUM</MenuItem>
                     <MenuItem value={"HIGH"}>HIGH</MenuItem>
-                    <MenuItem value={"ALL"}>ALL</MenuItem>
+                    <MenuItem value={"all"}>ALL</MenuItem>
                 </Select>
                 </FormControl>
             </div>         
@@ -144,7 +202,7 @@ export default function ControlBarOrigial() {
                 >
                     <MenuItem value={"DONE"}>DONE</MenuItem>
                     <MenuItem value={"UNDONE"}>UNDONE</MenuItem>
-                    <MenuItem value={"ALL"}>ALL</MenuItem>
+                    <MenuItem value={"all"}>ALL</MenuItem>
                 </Select>
                 </FormControl>
             </div>   
@@ -155,15 +213,47 @@ export default function ControlBarOrigial() {
             onClick={
                 fetchData
               }
-            >Search Todo</Button>           
+            >Search Todo</Button>  
+            <Button align="left" variant="contained"  onClick={showAll}>Show All</Button>         
             </div>
         </Paper>
         <Button align="left" variant="contained"  onClick={handleOpen}>+ Add Todo</Button>
-        <Button align="left" variant="contained"  onClick={fetchData}>Clear All</Button>
+        
+
+        
+      <Button variant="contained"
+        id="basic-button"
+        aria-controls={openmenu ? 'basic-menu' : undefined}
+        aria-haspopup="true"
+        aria-expanded={openmenu ? 'true' : undefined}
+        onClick={handleClickMenu}
+      >
+         Sort By <SortIcon></SortIcon>
+      </Button>
+      <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={openmenu}
+        onClose={handleCloseMenu}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}
+      >
+        <MenuItem onClick={handleCloseMenu} value={"priority"}>Priority</MenuItem>
+        <MenuItem onClick={handleCloseMenu} value={"due_date"}>Due Date</MenuItem>
+        <MenuItem onClick={handleCloseMenu} value={"priority-then-date"}>Priority, Due Date</MenuItem>
+        <MenuItem onClick={handleCloseMenu} value={"date-then-priority"}>Due Date, Priority</MenuItem>
+      </Menu>
+    
+        <IconButton
+            onClick={handleClickArrow}>
+            <ImportExportIcon></ImportExportIcon>
+        </IconButton>
+
         <p align="left">Total todos: {todos.length}</p>
         <Modal
             open={open}
-            //onClose={handleClose}
+            //onClose={}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
@@ -185,7 +275,7 @@ export default function ControlBarOrigial() {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
             
             <TextField id="outlined-basic" label="Todo name" variant="outlined" fullWidth 
-            value={content}
+            value={content} error={contentError} helperText="Incorrect entry."
             onChange={(e)=>setContent(e.target.value)}/>
             
             <div style={{padding:'15px 0px', textAlign:'left'}}>       
@@ -245,18 +335,18 @@ export default function ControlBarOrigial() {
              // orderBy={orderBy}
               //onSelectAllClick={handleSelectAllClick}
               //onRequestSort={handleRequestSort}
-              rowCount={todos.length}
+              //rowCount={todos.length}
             >
             <TableRow>
                 <TableCell>Check</TableCell>
                 <TableCell >Todo Name</TableCell>
                 <TableCell align="right"> 
                     Priority
-                    <IconButton><SortIcon/></IconButton>
+                    {/*<IconButton><SortIcon/></IconButton>*/}
                 </TableCell>
                 <TableCell align="right">
                     Due Date
-                    <IconButton><SortIcon/></IconButton>
+                    {/*<IconButton><SortIcon/></IconButton>*/}
                 </TableCell>
                 <TableCell align="right">Actions</TableCell>
             </TableRow>
@@ -289,7 +379,9 @@ export default function ControlBarOrigial() {
 
         </Table>
         </TableContainer>
-        <BasicPagination ></BasicPagination>
+        <Box sx={{ my: 2  }} style={{ display: "flex", justifyContent: "center" }}>
+        <Pagination count={todos.length} />
+        </Box>
             
 
 
