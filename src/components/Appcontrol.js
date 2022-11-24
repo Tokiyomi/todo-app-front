@@ -24,7 +24,7 @@ import TodosList from './Apptodos';
 
 export default function ControlBar() {
     //setTodos ={TodosList.setTodo}
-
+    
     const paperStyle={padding:'20px 20px', margin:"20px auto"}
     const [priority, setPriority] = React.useState('LOW');
     const [flag, setFlag] = React.useState('UNDONE');
@@ -33,6 +33,21 @@ export default function ControlBar() {
     //const [donedate, setDoneDate] = React.useState(null);
     const[content,setContent]=React.useState('')
     const[temp,setTemp]=React.useState([])
+
+    const[todos,setTodo]=React.useState([])
+    const fetchData = () => {
+        //e.preventDefault()
+      //React.useEffect(() => {
+        console.log('effect')
+        axios
+          .get('http://localhost:9090/todos')
+          .then(response => {
+            console.log('promise fulfilled')
+            setTodo(response.data)
+          })
+        //setChange((prevState) => !prevState);
+      //}, [])
+      }
     //const [change, setChange] = React.useState(false);
     
     /*const handleChange_priority = (event) => {
@@ -76,7 +91,7 @@ export default function ControlBar() {
         console.log(todo)
         axios
             .post('http://localhost:9090/todos',todo)
-            .then(setTemp(todo))
+            .then(fetchData)
         //setChange((prevState) => !prevState);
         
             //.then(response => todo.innerHTML = response.data.id )

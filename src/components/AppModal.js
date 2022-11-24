@@ -27,7 +27,7 @@ export default function BasicModal() {
   //const reload=()=>window.location.reload();
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => {setOpen(false)};//reload();
+  const handleClose = () => {setOpen(false)};//reload(); 
 
   return (
     <div>
