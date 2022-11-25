@@ -11,8 +11,12 @@ import Pagination from '@mui/material/Pagination';
 import Menu from '@mui/material/Menu';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ImportExportIcon from '@mui/icons-material/ImportExport';
+//import Alert from '@mui/material/Alert';
 
 import DenseTable from './Apptodotable';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
 
 import Box from '@mui/material/Box';
 
@@ -54,21 +58,34 @@ export default function ControlBarOrigial() {
     const [searchpriority, setSearchPriority] = React.useState('all');
     const [searchflag, setSearchFlag] = React.useState('all');
     const [searchcontent, setSearchContent] = React.useState('');
-    const [creationdate, setCreationDatetime] = React.useState(new Date());
-    const [duedate, setDueDate] = React.useState(null);
+    const [creationdate, setCreationDatetime] = React.useState(null);
+    const [due_date, setDue_date] = React.useState(null);
     const [donedate, setDoneDate] = React.useState(null);
     const[content,setContent]=React.useState('')
     const[todos,setTodo]=React.useState([])
+    const [todosperpage, setTodosPerPage]=React.useState(10)
+    //const [currentTodos, setCurrentTodos]=React.useState(0)
+
+    const [totalTodos, setTotalTodos] = React.useState(null)
+
+    const [anchorEl2, setAnchorEl2] = React.useState(null);
+    const [selectedIndex, setSelectedIndex] = React.useState(1);
+    const open2 = Boolean(anchorEl2);
     
     //const [getcontent, setGetContent] = React.useState('none')
     const [orden, setOrden]=React.useState('default')
     const [page, setPage]=React.useState(1)
+    const [totalpages, setTotalPages]=React.useState(1)
     //const [getflag, setGetFlag] = React.useState('all')
     //const [getpriority, setGetPriority] = React.useState('all')
 
+    const handlePageChange = (event, page) => {
+        setPage(page);
+    };
+
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
-    const handleClose = () => {setOpen(false)};//reload();
+    const handleClose = () => {{setOpen(false); clearAddForm(); setContentError(false); setContentErrorMsg(null); setDue_date(null);setPriority('LOW')}};//reload();
     
     const [anchorEl, setAnchorEl] = React.useState(null);
     const openmenu = Boolean(anchorEl);
@@ -78,6 +95,10 @@ export default function ControlBarOrigial() {
     const handleCloseMenu = () => {
         setAnchorEl(null);
     };
+
+    //React.useEffect(() => {
+        //fetchData();
+    //}, [orden]);
 
     const [asc, setAsc] = React.useState(false)
     const handleClickArrow = () => {
@@ -97,9 +118,19 @@ export default function ControlBarOrigial() {
 
     React.useEffect(() => {
         fetchData();
-    }, [show]);
+    }, [show,orden,asc,page]);
+
+    const clearAddForm = () => {
+        setContent('');
+        //setFlag('a');
+        setPriority('LOW');
+        setDue_date(null);
+        //fetchData();
+        //setShow(!show)
+    };
 
     const [contentError, setContentError] = React.useState(false);
+    const [contentErrorMsg, setContentErrorMsg] = React.useState(null);
 
     const style = {
         position: 'absolute',
@@ -115,15 +146,18 @@ export default function ControlBarOrigial() {
     
     const handleClick2= (e)=>{
         e.preventDefault()
-        const todo={content,priority,flag,duedate,creationdate}
+        const todo={content,priority,flag,due_date,creationdate}
         console.log(todo)
         axios
             .post('http://localhost:9090/todos',todo)
             .then(fetchData)
             .then(setContentError(false))
+            .then(setContentErrorMsg(null))
+            //.then(setPage)
             .catch(function (error) {
-                console.error(error.response.data['validation message']['Invalid content']);
+                console.error(error);
                 setContentError(true);
+                setContentErrorMsg(error.response.data['validation message']['Invalid content']);
               })
     }
 
@@ -143,6 +177,11 @@ export default function ControlBarOrigial() {
                 console.log('promise fulfilled')
                 //console.log(response.data.items)
                 setTodo(response.data.items)
+                console.log(response.data.totalPages)
+                //setPage(response.data.totalPages)
+                setTotalTodos(response.data.totalTodos)
+                setTotalPages(response.data.totalPages)
+                setTodosPerPage(response.data.todosPerPage)
               })
               .catch(function (error) {
                 console.error(error);
@@ -238,11 +277,12 @@ export default function ControlBarOrigial() {
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}
-      >
-        <MenuItem onClick={handleCloseMenu} value={"priority"}>Priority</MenuItem>
-        <MenuItem onClick={handleCloseMenu} value={"due_date"}>Due Date</MenuItem>
-        <MenuItem onClick={handleCloseMenu} value={"priority-then-date"}>Priority, Due Date</MenuItem>
-        <MenuItem onClick={handleCloseMenu} value={"date-then-priority"}>Due Date, Priority</MenuItem>
+      > 
+        <MenuItem onClick={() => {handleCloseMenu(); setOrden("default")}} >Unsort</MenuItem>
+        <MenuItem onClick={() => {handleCloseMenu(); setOrden("priority")}} >Priority</MenuItem>
+        <MenuItem onClick={() => {handleCloseMenu(); setOrden("due_date")}} >Due Date</MenuItem>
+        <MenuItem onClick={() => {handleCloseMenu(); setOrden("priority-then-date")}} >Priority, Due Date</MenuItem>
+        <MenuItem onClick={() => {handleCloseMenu(); setOrden("date-then-priority")}} >Due Date, Priority</MenuItem>
       </Menu>
     
         <IconButton
@@ -250,10 +290,13 @@ export default function ControlBarOrigial() {
             <ImportExportIcon></ImportExportIcon>
         </IconButton>
 
-        <p align="left">Total todos: {todos.length}</p>
+
+        {/*<p align="left">Total todos: {totalTodos}</p>*/}
+        <p align="left">Sort view: {orden}</p>
+        <p align='left'> Reversed order: {String(asc)}</p>
         <Modal
             open={open}
-            //onClose={}
+            //onClose={clearAddForm}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
@@ -275,7 +318,7 @@ export default function ControlBarOrigial() {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
             
             <TextField id="outlined-basic" label="Todo name" variant="outlined" fullWidth 
-            value={content} error={contentError} helperText="Incorrect entry."
+            value={content} error={contentError} helperText={contentErrorMsg}
             onChange={(e)=>setContent(e.target.value)}/>
             
             <div style={{padding:'15px 0px', textAlign:'left'}}>       
@@ -303,9 +346,10 @@ export default function ControlBarOrigial() {
                     renderInput={(params) => <TextField {...params} />} // sx={{width: '35%'}}
                     label="Due Date (Optional)"
                     //format="dd/MM/yyyy"
-                    value={duedate}
+                    value={due_date}
                     onChange={(newValue) => {
-                    setDueDate(new Date(newValue));
+                    setDue_date(new Date(newValue));
+                    //setDueDate(newValue);
                     }}
                     //renderInput={(params) => <TextField {...params} helperText="Optional"/>}
                 />
@@ -362,6 +406,7 @@ export default function ControlBarOrigial() {
                 </TableCell>
                 <TableCell>{todo.content}</TableCell>
                 <TableCell align="right">{todo.priority}</TableCell>
+                {/*<TableCell align="right">{todo.duedate}</TableCell>*/}
                 <TableCell align="right">{todo.due_date}</TableCell>
                 <TableCell align="right">
                     <IconButton>
@@ -374,13 +419,20 @@ export default function ControlBarOrigial() {
                 </TableRow>
             ))}
             </TableBody>
-
+            
+            
             
 
         </Table>
         </TableContainer>
+        
+            <p>Todos per page: {todosperpage}</p>
+            <p>Showing {totalTodos!=0?((page-1)*todosperpage+1):0}-{(page*todosperpage)>totalTodos?totalTodos:(page*todosperpage)} of {totalTodos} todos</p>
+            
+
+        
         <Box sx={{ my: 2  }} style={{ display: "flex", justifyContent: "center" }}>
-        <Pagination count={todos.length} />
+        <Pagination count={totalpages} page={page} onChange={handlePageChange} />
         </Box>
             
 
