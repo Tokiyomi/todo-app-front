@@ -58,19 +58,15 @@ export default function ControlBarOrigial() {
     const [searchpriority, setSearchPriority] = React.useState('all');
     const [searchflag, setSearchFlag] = React.useState('all');
     const [searchcontent, setSearchContent] = React.useState('');
-    const [creationdate, setCreationDatetime] = React.useState(null);
+    //const [creationdate, setCreationDatetime] = React.useState(null);
     const [due_date, setDue_date] = React.useState(null);
-    const [donedate, setDoneDate] = React.useState(null);
+    //const [donedate, setDoneDate] = React.useState(null);
     const[content,setContent]=React.useState('')
     const[todos,setTodo]=React.useState([])
     const [todosperpage, setTodosPerPage]=React.useState(10)
     //const [currentTodos, setCurrentTodos]=React.useState(0)
 
     const [totalTodos, setTotalTodos] = React.useState(null)
-
-    const [anchorEl2, setAnchorEl2] = React.useState(null);
-    const [selectedIndex, setSelectedIndex] = React.useState(1);
-    const open2 = Boolean(anchorEl2);
     
     //const [getcontent, setGetContent] = React.useState('none')
     const [orden, setOrden]=React.useState('default')
@@ -78,6 +74,8 @@ export default function ControlBarOrigial() {
     const [totalpages, setTotalPages]=React.useState(1)
     //const [getflag, setGetFlag] = React.useState('all')
     //const [getpriority, setGetPriority] = React.useState('all')
+
+    //const [editId, setEditId] = React.useState(null)
 
     const handlePageChange = (event, page) => {
         setPage(page);
@@ -87,6 +85,11 @@ export default function ControlBarOrigial() {
     const handleOpen = () => setOpen(true);
     const handleClose = () => {{setOpen(false); clearAddForm(); setContentError(false); setContentErrorMsg(null); setDue_date(null);setPriority('LOW')}};//reload();
     
+    const [openEdit, setOpenEdit] = React.useState(false);
+    const handleOpenEdit = () => {setOpenEdit(true);}
+    const handleCloseEdit = () => {{setOpenEdit(false);clearAddForm(); setContentError(false); setContentErrorMsg(null); setDue_date(null);setPriority('LOW')}};//reload();
+
+
     const [anchorEl, setAnchorEl] = React.useState(null);
     const openmenu = Boolean(anchorEl);
     const handleClickMenu = (event) => {
@@ -143,10 +146,30 @@ export default function ControlBarOrigial() {
         boxShadow: 24,
         p: 4,
       };
+
+    const [idTodo, setIdTodo] = React.useState(null)
+
+    const editTodo = (id) => {
+        console.log('edit effect')
+        const todo={content,priority,due_date}
+        console.log(todo)
+        axios
+        .put('http://localhost:9090/todos/'+String(id),todo)
+            .then(fetchData)
+            .then(setContentError(false))
+            .then(setContentErrorMsg(null))
+            //.then(setPage)
+            .catch(function (error) {
+                console.error(error);
+                setContentError(true);
+                setContentErrorMsg(error.response.data['validation message']['Invalid content']);
+              })
+    };
     
     const handleClick2= (e)=>{
         e.preventDefault()
-        const todo={content,priority,flag,due_date,creationdate}
+        //const creationdate = new Date()
+        const todo={content,priority,flag,due_date}
         console.log(todo)
         axios
             .post('http://localhost:9090/todos',todo)
@@ -160,6 +183,31 @@ export default function ControlBarOrigial() {
                 setContentErrorMsg(error.response.data['validation message']['Invalid content']);
               })
     }
+
+    const handleDoneCheck = (id, status) => {
+        console.log('check effect')
+        const operation = status=="DONE"?"/undone":"/done"
+        //setChecked(status=="DONE"?true:false)
+        axios
+            .put('http://localhost:9090/todos/'+String(id)+operation)
+            .then(fetchData)
+            .catch(function (error) {
+                console.log('done error')
+                console.error(error);
+              })
+    };
+
+
+    const deleteTodo = (id) => {
+        console.log('delete effect')
+        axios
+            .delete('http://localhost:9090/todos/'+String(id)+'/delete')
+            .then(fetchData)
+            .catch(function (error) {
+                console.log('delete error')
+                console.error(error);
+              })
+    };
 
     const fetchData = () => {
             console.log('effect')
@@ -367,6 +415,10 @@ export default function ControlBarOrigial() {
                 handleClick2
               }
             >Add New Todo</Button>
+            <Button variant="contained" 
+                                //onClick={editTodo}
+                                onClick={clearAddForm}
+                                >Clear</Button>
             </Box>   
             </Box>
         </Modal>
@@ -382,7 +434,7 @@ export default function ControlBarOrigial() {
               //rowCount={todos.length}
             >
             <TableRow>
-                <TableCell>Check</TableCell>
+                <TableCell>Status</TableCell>
                 <TableCell >Todo Name</TableCell>
                 <TableCell align="right"> 
                     Priority
@@ -400,19 +452,103 @@ export default function ControlBarOrigial() {
                 <TableRow
                 key={todo.id}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                style={todo.flag=="DONE"?{textDecoration:'line-through'}:{}}
                 >
-                <TableCell component="th" scope="row">
-                    <Checkbox />
+                <TableCell component="th" scope="row" onClick={async() => {await handleDoneCheck(todo.id, todo.flag)}}>
+                    <Checkbox  checked={todo.flag=="DONE"?true:false}/>
                 </TableCell>
                 <TableCell>{todo.content}</TableCell>
                 <TableCell align="right">{todo.priority}</TableCell>
                 {/*<TableCell align="right">{todo.duedate}</TableCell>*/}
                 <TableCell align="right">{todo.due_date}</TableCell>
                 <TableCell align="right">
-                    <IconButton>
+                    <IconButton  onClick={async() => {await 
+                        handleOpenEdit(); 
+                        setIdTodo(todo.id); 
+                        setContent(todo.content);
+                        setPriority(todo.priority);
+                        setDue_date(todo.due_date);
+                        }}>
                     <EditIcon/>
                     </IconButton>
-                    <IconButton>
+                        <Modal
+                            //key={todo.id}
+                            open={openEdit}
+                            //onClose={clearAddForm}
+                            //aria-labelledby="modal-modal-title"
+                            //aria-describedby="modal-modal-description"
+                            >
+                            <Box sx={style} >
+                            <AppBar justify="flex-end" >
+                            <CloseIcon onClick={handleCloseEdit} />
+                            </AppBar>
+                            <Typography variant="h5" align="center">
+                            Edit this todo
+                            </Typography>
+                            {/*<Typography id="modal-modal-title" variant="h4" component="h4">
+                                Add a new Todo
+                                </Typography>*/}
+                            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                                Fill the form to edit the todo information!
+                            </Typography>
+                            <Paper sx={{ my: 2 }} style={paperStyle}>
+                            {/*<h1 style={{color:"blue"}}>Add Todo</h1>*/}
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            
+                            <TextField id="outlined-basic" label="Todo name" variant="outlined" fullWidth 
+                            value={content} error={contentError} helperText={contentErrorMsg}
+                            onChange={(e)=>setContent(e.target.value)}/>
+                            
+                            <div style={{padding:'15px 0px', textAlign:'left'}}>       
+                                <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-readonly-label">Priority</InputLabel>
+                                <Select
+                                //style={{ marginTop: 18}}
+                                //renderInput={(params) => <TextField {...params} sx={{width: '50%'}} /> }
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={priority}
+                                label="Priority"
+                                //onChange={handleChange_priority}
+                                onChange={(e)=>setPriority(e.target.value)}
+                                >
+                                    <MenuItem value={"LOW"}>LOW</MenuItem>
+                                    <MenuItem value={"MEDIUM"}>MEDIUM</MenuItem>
+                                    <MenuItem value={"HIGH"}>HIGH</MenuItem>
+                                </Select>
+                                </FormControl>
+                            </div>         
+                            
+                            <div style={{padding:'8px 0px', textAlign:'left'}}>
+                                <DateTimePicker sx={{ my: 2 }}
+                                    renderInput={(params) => <TextField {...params} />} // sx={{width: '35%'}}
+                                    label="Due Date (Optional)"
+                                    //format="dd/MM/yyyy"
+                                    value={due_date}
+                                    onChange={(newValue) => {
+                                    setDue_date(new Date(newValue));
+                                    //setDueDate(newValue);
+                                    }}
+                                    //renderInput={(params) => <TextField {...params} helperText="Optional"/>}
+                                />
+                            </div>
+                            
+                            </LocalizationProvider>
+           
+                            </Paper>
+                            <Box textAlign='center' style={{padding:'15px 0px'}}>
+                                <Button variant="contained" 
+                                //onClick={editTodo}
+                                onClick={async() => {await editTodo(idTodo)}}
+                                >Edit Todo</Button>
+                                <Button variant="contained" 
+                                //onClick={editTodo}
+                                onClick={async() => {await clearAddForm()}}
+                                >Clear</Button>
+                                </Box>   
+                                </Box>
+                        </Modal>
+                    <IconButton  onClick={async() => {await deleteTodo(todo.id)}}>
                     <DeleteIcon/>
                     </IconButton>
                 </TableCell>
