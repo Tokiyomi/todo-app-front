@@ -52,7 +52,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton } from '@mui/material';
 
 export default function ControlBarOrigial() {
-    const paperStyle={padding:'20px 20px', margin:"20px auto"}
+    const paperStyle={padding:'20px 20px', margin:'20px auto'}
     const [priority, setPriority] = React.useState('LOW');
     const [flag, setFlag] = React.useState('UNDONE');
     const [searchpriority, setSearchPriority] = React.useState('all');
@@ -65,6 +65,11 @@ export default function ControlBarOrigial() {
     const[todos,setTodo]=React.useState([])
     const [todosperpage, setTodosPerPage]=React.useState(10)
     //const [currentTodos, setCurrentTodos]=React.useState(0)
+
+    const [timeAvg, setTimeAvg] = React.useState(0)
+    const [lowTimeAvg, setLowTimeAvg] = React.useState(0)
+    const [medTimeAvg, setMedTimeAvg] = React.useState(0)
+    const [highTimeAvg, setHighTimeAvg] = React.useState(0)
 
     const [totalTodos, setTotalTodos] = React.useState(null)
     
@@ -82,11 +87,11 @@ export default function ControlBarOrigial() {
     };
 
     const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
+    const handleOpen = () => {console.log("modal 1 open");setOpen(true);}
     const handleClose = () => {{setOpen(false); clearAddForm(); setContentError(false); setContentErrorMsg(null); setDue_date(null);setPriority('LOW')}};//reload();
     
     const [openEdit, setOpenEdit] = React.useState(false);
-    const handleOpenEdit = () => {setOpenEdit(true);}
+    const handleOpenEdit = () => {console.log("modal 2 open");setOpenEdit(true);}
     const handleCloseEdit = () => {{setOpenEdit(false);clearAddForm(); setContentError(false); setContentErrorMsg(null); setDue_date(null);setPriority('LOW')}};//reload();
 
 
@@ -186,7 +191,7 @@ export default function ControlBarOrigial() {
 
     const handleDoneCheck = (id, status) => {
         console.log('check effect')
-        const operation = status=="DONE"?"/undone":"/done"
+        const operation = status==="DONE"?"/undone":"/done"
         //setChecked(status=="DONE"?true:false)
         axios
             .put('http://localhost:9090/todos/'+String(id)+operation)
@@ -237,7 +242,28 @@ export default function ControlBarOrigial() {
     }
     
 
-    React.useEffect(() => fetchData(), []);
+    //React.useEffect(() => fetchData(), [todos]);
+
+    const fetchAvg = () => {
+        console.log('avg effect')
+        axios
+          .get('http://localhost:9090/todos/avg')
+          .then(response => {
+            console.log('avg promise fulfilled')
+            //console.log(response.data.items)
+            setTimeAvg(response.data["GLOBAL"])
+            setLowTimeAvg(response.data["LOW"])
+            setMedTimeAvg(response.data["MEDIUM"])
+            setHighTimeAvg(response.data["HIGH"])
+            //console.log(response.data.totalPages)
+            //setPage(response.data.totalPages)
+          })
+          .catch(function (error) {
+            console.error(error);
+          })
+    }
+
+    React.useEffect(() => fetchAvg(), [todos]);
 
     const Item = styled(Paper)(({ theme }) => ({
         backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -253,18 +279,19 @@ export default function ControlBarOrigial() {
             {/*<h1 style={{color:"blue"}}>Search Todo</h1>*/}
             <LocalizationProvider dateAdapter={AdapterDayjs}>
             
-            <TextField id="outlined-basic" label="Find by name" variant="outlined" fullWidth 
+            <TextField size="small" id="outlined-basic" label="Find by name" variant="outlined" fullWidth 
             value={searchcontent}
             onChange={(e)=>setSearchContent(e.target.value)}/>
             
-            <div style={{padding:'15px 0px', textAlign:'left'}}>       
-                <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-readonly-label">Priority</InputLabel>
+            <div style={{padding:'15px 0', textAlign:'left'}}>       
+                <FormControl size="small" fullWidth>
+                <InputLabel  id="demo-simple-select-readonly-label">Priority</InputLabel>
                 <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 value={searchpriority}
                 label="Priority"
+                //style={{height:'40px', fontSize:'15px'}}
                 //onChange={handleChange_priority}
                 onChange={(e)=>setSearchPriority(e.target.value)}
                 >
@@ -276,8 +303,8 @@ export default function ControlBarOrigial() {
                 </FormControl>
             </div>         
             
-            <div style={{padding:'15px 0px', textAlign:'left'}}>       
-                <FormControl fullWidth>
+            <div style={{padding:'0px 0px', textAlign:'left'}}>       
+                <FormControl fullWidth size='small'>
                 <InputLabel id="demo-simple-select-readonly-label">State</InputLabel>
                 <Select
                 labelId="demo-simple-select-label"
@@ -295,27 +322,30 @@ export default function ControlBarOrigial() {
             </div>   
             
             </LocalizationProvider>
-            <div style={{padding:'15px 0px'}}>
-            <Button variant="contained" 
+            <Container style={{padding:'15px 0px 0px 0px', justifyContent:'space-around', display:'flex'}}>
+            <Button size='small' variant="contained"  style={{}}
             onClick={
                 fetchData
               }
             >Search Todo</Button>  
-            <Button align="left" variant="contained"  onClick={showAll}>Show All</Button>         
-            </div>
+            <Button size='small' align="left" variant="contained"  onClick={showAll}>Show All</Button>         
+            </Container>
         </Paper>
-        <Button align="left" variant="contained"  onClick={handleOpen}>+ Add Todo</Button>
-        
 
-        
-      <Button variant="contained"
+    <Container  style={{display:'flex', justifyContent:'space-between'}}>
+        <div style={{margin:'0'}}>
+        <Button size='small' align="left" variant="contained"  onClick={handleOpen}>+ Add Todo</Button>
+        </div>
+
+        <div>
+      <Button variant="contained" size='small'
         id="basic-button"
         aria-controls={openmenu ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={openmenu ? 'true' : undefined}
         onClick={handleClickMenu}
       >
-         Sort By <SortIcon></SortIcon>
+         Sort By <SortIcon size='small'></SortIcon>
       </Button>
       <Menu
         id="basic-menu"
@@ -337,11 +367,14 @@ export default function ControlBarOrigial() {
             onClick={handleClickArrow}>
             <ImportExportIcon></ImportExportIcon>
         </IconButton>
+        </div>
+        <p align="left">Sort view: {orden}</p>
+        <p align='left'> Reversed order: {String(asc)}</p>
+    </Container>
 
 
         {/*<p align="left">Total todos: {totalTodos}</p>*/}
-        <p align="left">Sort view: {orden}</p>
-        <p align='left'> Reversed order: {String(asc)}</p>
+        
         <Modal
             open={open}
             //onClose={clearAddForm}
@@ -358,8 +391,92 @@ export default function ControlBarOrigial() {
             {/*<Typography id="modal-modal-title" variant="h4" component="h4">
                 Add a new Todo
                 </Typography>*/}
-            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                Fill the form to add a new todo task!
+            <Typography textAlign="center" id="modal-modal-description" sx={{ mt: 2 }}>
+                Fill the form to add a new Todo task!
+            </Typography>
+            <Paper sx={{ my: 2 }} style={paperStyle}>
+            {/*<h1 style={{color:"blue"}}>Add Todo</h1>*/}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            
+            <TextField  id="outlined-basic" label="Todo name" variant="outlined" fullWidth 
+            value={content} error={contentError} helperText={contentErrorMsg}
+            onChange={(e)=>setContent(e.target.value)}/>
+            
+            <div style={{padding:'15px 0px', textAlign:'left'}}>       
+                <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-readonly-label">Priority</InputLabel>
+                <Select
+                //style={{ marginTop: 18}}
+                //renderInput={(params) => <TextField {...params} sx={{width: '50%'}} /> }
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={priority}
+                label="Priority"
+                //onChange={handleChange_priority}
+                onChange={(e)=>setPriority(e.target.value)}
+                >
+                    <MenuItem value={"LOW"}>LOW</MenuItem>
+                    <MenuItem value={"MEDIUM"}>MEDIUM</MenuItem>
+                    <MenuItem value={"HIGH"}>HIGH</MenuItem>
+                </Select>
+                </FormControl>
+            </div>         
+            
+            <div style={{ textAlign:'left'}}>
+                <DateTimePicker sx={{ my: 2 }}
+                    renderInput={(params) => <TextField {...params} />} // sx={{width: '35%'}}
+                    label="Due Date (Optional)"
+                    //format="dd/MM/yyyy"
+                    value={due_date}
+                    onChange={(newValue) => {
+                    setDue_date(new Date(newValue));
+                    //setDueDate(newValue);
+                    }}
+                    //renderInput={(params) => <TextField {...params} helperText="Optional"/>}
+                />
+            </div>
+            
+            </LocalizationProvider>
+            
+            
+            
+            
+        </Paper>
+        <Container style={{ justifyContent:'space-around', display:'flex'}}>
+        
+            <Button variant="contained" 
+            onClick={
+                handleClick2
+              }
+            >Add New Todo</Button>
+            <Button variant="contained" 
+                                //onClick={editTodo}
+                                onClick={clearAddForm}
+                                >Clear</Button>
+            
+            </Container>   
+        </Box>
+        </Modal>
+
+        <Modal
+            //key={todo.id}
+            open={openEdit}
+            //onClose={clearAddForm}
+            aria-labelledby="modal-modal-title2"
+            aria-describedby="modal-modal-description2"
+            >
+            <Box sx={style} >
+            <AppBar justify="flex-end" >
+            <CloseIcon onClick={handleCloseEdit} />
+            </AppBar>
+            <Typography variant="h5" align="center">
+            Edit this Todo
+            </Typography>
+            {/*<Typography id="modal-modal-title" variant="h4" component="h4">
+                Add a new Todo
+                </Typography>*/}
+            <Typography id="modal-modal-description" textAlign="center" sx={{ mt: 2 }}>
+                Fill the form to edit the Todo information!
             </Typography>
             <Paper sx={{ my: 2 }} style={paperStyle}>
             {/*<h1 style={{color:"blue"}}>Add Todo</h1>*/}
@@ -389,7 +506,7 @@ export default function ControlBarOrigial() {
                 </FormControl>
             </div>         
             
-            <div style={{padding:'8px 0px', textAlign:'left'}}>
+            <div style={{ textAlign:'left'}}>
                 <DateTimePicker sx={{ my: 2 }}
                     renderInput={(params) => <TextField {...params} />} // sx={{width: '35%'}}
                     label="Due Date (Optional)"
@@ -404,27 +521,23 @@ export default function ControlBarOrigial() {
             </div>
             
             </LocalizationProvider>
-            
-            
-            
-            
-        </Paper>
-        <Box textAlign='center' style={{padding:'15px 0px'}}>
-            <Button variant="contained" 
-            onClick={
-                handleClick2
-              }
-            >Add New Todo</Button>
-            <Button variant="contained" 
-                                //onClick={editTodo}
-                                onClick={clearAddForm}
-                                >Clear</Button>
-            </Box>   
-            </Box>
+
+            </Paper>
+            <Container style={{ justifyContent:'space-around', display:'flex'}}>
+                <Button variant="contained" 
+                //onClick={editTodo}
+                onClick={async() => {await editTodo(idTodo)}}
+                >Edit Todo</Button>
+                <Button variant="contained" 
+                //onClick={editTodo}
+                onClick={async() => {await clearAddForm()}}
+                >Clear</Button>
+                </Container>   
+                </Box>
         </Modal>
         
-        <TableContainer component={Paper} sx={{ my: 2 }}>
-        <Table  size="small" >  
+        <TableContainer component={Paper} sx={{ my: 2}} style={{}}>
+        <Table  size="small" aria-label="a dense table">  
             <TableHead
               //numSelected={selected.length}
               //order={order}
@@ -452,10 +565,10 @@ export default function ControlBarOrigial() {
                 <TableRow
                 key={todo.id}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                style={todo.flag=="DONE"?{textDecoration:'line-through'}:{}}
+                style={todo.flag==="DONE"?{textDecoration:'line-through', }:{}}
                 >
                 <TableCell component="th" scope="row" onClick={async() => {await handleDoneCheck(todo.id, todo.flag)}}>
-                    <Checkbox  checked={todo.flag=="DONE"?true:false}/>
+                    <Checkbox sx={{}} size='medium' checked={todo.flag==="DONE"?true:false}/>
                 </TableCell>
                 <TableCell>{todo.content}</TableCell>
                 <TableCell align="right">{todo.priority}</TableCell>
@@ -471,83 +584,7 @@ export default function ControlBarOrigial() {
                         }}>
                     <EditIcon/>
                     </IconButton>
-                        <Modal
-                            //key={todo.id}
-                            open={openEdit}
-                            //onClose={clearAddForm}
-                            //aria-labelledby="modal-modal-title"
-                            //aria-describedby="modal-modal-description"
-                            >
-                            <Box sx={style} >
-                            <AppBar justify="flex-end" >
-                            <CloseIcon onClick={handleCloseEdit} />
-                            </AppBar>
-                            <Typography variant="h5" align="center">
-                            Edit this todo
-                            </Typography>
-                            {/*<Typography id="modal-modal-title" variant="h4" component="h4">
-                                Add a new Todo
-                                </Typography>*/}
-                            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                                Fill the form to edit the todo information!
-                            </Typography>
-                            <Paper sx={{ my: 2 }} style={paperStyle}>
-                            {/*<h1 style={{color:"blue"}}>Add Todo</h1>*/}
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            
-                            <TextField id="outlined-basic" label="Todo name" variant="outlined" fullWidth 
-                            value={content} error={contentError} helperText={contentErrorMsg}
-                            onChange={(e)=>setContent(e.target.value)}/>
-                            
-                            <div style={{padding:'15px 0px', textAlign:'left'}}>       
-                                <FormControl fullWidth>
-                                <InputLabel id="demo-simple-select-readonly-label">Priority</InputLabel>
-                                <Select
-                                //style={{ marginTop: 18}}
-                                //renderInput={(params) => <TextField {...params} sx={{width: '50%'}} /> }
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={priority}
-                                label="Priority"
-                                //onChange={handleChange_priority}
-                                onChange={(e)=>setPriority(e.target.value)}
-                                >
-                                    <MenuItem value={"LOW"}>LOW</MenuItem>
-                                    <MenuItem value={"MEDIUM"}>MEDIUM</MenuItem>
-                                    <MenuItem value={"HIGH"}>HIGH</MenuItem>
-                                </Select>
-                                </FormControl>
-                            </div>         
-                            
-                            <div style={{padding:'8px 0px', textAlign:'left'}}>
-                                <DateTimePicker sx={{ my: 2 }}
-                                    renderInput={(params) => <TextField {...params} />} // sx={{width: '35%'}}
-                                    label="Due Date (Optional)"
-                                    //format="dd/MM/yyyy"
-                                    value={due_date}
-                                    onChange={(newValue) => {
-                                    setDue_date(new Date(newValue));
-                                    //setDueDate(newValue);
-                                    }}
-                                    //renderInput={(params) => <TextField {...params} helperText="Optional"/>}
-                                />
-                            </div>
-                            
-                            </LocalizationProvider>
-           
-                            </Paper>
-                            <Box textAlign='center' style={{padding:'15px 0px'}}>
-                                <Button variant="contained" 
-                                //onClick={editTodo}
-                                onClick={async() => {await editTodo(idTodo)}}
-                                >Edit Todo</Button>
-                                <Button variant="contained" 
-                                //onClick={editTodo}
-                                onClick={async() => {await clearAddForm()}}
-                                >Clear</Button>
-                                </Box>   
-                                </Box>
-                        </Modal>
+                        
                     <IconButton  onClick={async() => {await deleteTodo(todo.id)}}>
                     <DeleteIcon/>
                     </IconButton>
@@ -561,15 +598,27 @@ export default function ControlBarOrigial() {
 
         </Table>
         </TableContainer>
-        
-            <p>Todos per page: {todosperpage}</p>
-            <p>Showing {totalTodos!=0?((page-1)*todosperpage+1):0}-{(page*todosperpage)>totalTodos?totalTodos:(page*todosperpage)} of {totalTodos} todos</p>
-            
+        <Container style={{ display: "flex", justifyContent: 'space-between' }}>
+            Todos per page: {todosperpage}
+            <Pagination count={totalpages} page={page} onChange={handlePageChange} />
+            Showing {totalTodos!==0?((page-1)*todosperpage+1):0}-{(page*todosperpage)>totalTodos?totalTodos:(page*todosperpage)} of {totalTodos} todos
+        </Container>
+           
 
         
-        <Box sx={{ my: 2  }} style={{ display: "flex", justifyContent: "center" }}>
-        <Pagination count={totalpages} page={page} onChange={handlePageChange} />
-        </Box>
+        <Paper component={Paper} sx={{ my: 2  }} style={{ display: "flex", justifyContent: "space-around" }}>
+        <div style={{textAlign:'left'}}>
+        <br/>Average time to finish tasks:<br/><br/><br/>
+            {timeAvg.days} days, {timeAvg.hours} hours and {timeAvg.minutes} minutes
+        </div>
+        <div style={{textAlign:'center'}}>
+        <br/>Average time to finish tasks by priority:<br/><br/>
+            Low: {lowTimeAvg.days} days, {lowTimeAvg.hours} hours and {lowTimeAvg.minutes} minutes<br/>
+            Medium: {medTimeAvg.days} days, {medTimeAvg.hours} hours and {medTimeAvg.minutes} minutes<br/>
+            High: {highTimeAvg.days} days, {highTimeAvg.hours} hours and {highTimeAvg.minutes} minutes<br/><br/>
+        </div>
+    
+        </Paper>
             
 
 
