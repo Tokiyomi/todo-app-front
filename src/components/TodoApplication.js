@@ -1,45 +1,26 @@
+// useful imports
 import * as React from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
-import { Container ,Paper,Button, TableFooter} from '@mui/material';
+import { Container ,Paper,Button} from '@mui/material';
 import SortIcon from '@mui/icons-material/Sort';
-import TablePagination from '@mui/material/TablePagination';
-import BasicPagination from './Apppagination';
 import Pagination from '@mui/material/Pagination';
 import Menu from '@mui/material/Menu';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import ImportExportIcon from '@mui/icons-material/ImportExport';
-//import Alert from '@mui/material/Alert';
-
-import DenseTable from './Apptodotable';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-
 import Box from '@mui/material/Box';
-
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import CloseIcon from '@mui/icons-material/Close';
+import ClearIcon from '@mui/icons-material/Clear';
 import AppBar from '@mui/material/AppBar';
-
 import axios from 'axios';
-
-
 import InputLabel from '@mui/material/InputLabel';
-
 import { styled } from '@mui/material/styles';
-import Grid from '@mui/material/Unstable_Grid2';
-
-
-import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -49,98 +30,12 @@ import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { IconButton } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
 
-export default function ControlBarOrigial() {
-    const paperStyle={padding:'20px 20px', margin:'20px auto'}
-    const [priority, setPriority] = React.useState('LOW');
-    const [flag, setFlag] = React.useState('UNDONE');
-    const [searchpriority, setSearchPriority] = React.useState('all');
-    const [searchflag, setSearchFlag] = React.useState('all');
-    const [searchcontent, setSearchContent] = React.useState('');
-    //const [creationdate, setCreationDatetime] = React.useState(null);
-    const [due_date, setDue_date] = React.useState(null);
-    //const [donedate, setDoneDate] = React.useState(null);
-    const[content,setContent]=React.useState('')
-    const[todos,setTodo]=React.useState([])
-    const [todosperpage, setTodosPerPage]=React.useState(10)
-    //const [currentTodos, setCurrentTodos]=React.useState(0)
+export default function TodoApplication() {
 
-    const [timeAvg, setTimeAvg] = React.useState(0)
-    const [lowTimeAvg, setLowTimeAvg] = React.useState(0)
-    const [medTimeAvg, setMedTimeAvg] = React.useState(0)
-    const [highTimeAvg, setHighTimeAvg] = React.useState(0)
-
-    const [totalTodos, setTotalTodos] = React.useState(null)
-    
-    //const [getcontent, setGetContent] = React.useState('none')
-    const [orden, setOrden]=React.useState('default')
-    const [page, setPage]=React.useState(1)
-    const [totalpages, setTotalPages]=React.useState(1)
-    //const [getflag, setGetFlag] = React.useState('all')
-    //const [getpriority, setGetPriority] = React.useState('all')
-
-    //const [editId, setEditId] = React.useState(null)
-
-    const handlePageChange = (event, page) => {
-        setPage(page);
-    };
-
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => {console.log("modal 1 open");setOpen(true);}
-    const handleClose = () => {{setOpen(false); clearAddForm(); setContentError(false); setContentErrorMsg(null); setDue_date(null);setPriority('LOW')}};//reload();
-    
-    const [openEdit, setOpenEdit] = React.useState(false);
-    const handleOpenEdit = () => {console.log("modal 2 open");setOpenEdit(true);}
-    const handleCloseEdit = () => {{setOpenEdit(false);clearAddForm(); setContentError(false); setContentErrorMsg(null); setDue_date(null);setPriority('LOW')}};//reload();
-
-
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const openmenu = Boolean(anchorEl);
-    const handleClickMenu = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleCloseMenu = () => {
-        setAnchorEl(null);
-    };
-
-    //React.useEffect(() => {
-        //fetchData();
-    //}, [orden]);
-
-    const [asc, setAsc] = React.useState(false)
-    const handleClickArrow = () => {
-        setAsc(!asc)
-        //console.log(asc)
-    }
-    ;
-
-    const [show, setShow] = React.useState(false)
-    const showAll = () => {
-        setSearchContent('');
-        setSearchFlag('all');
-        setSearchPriority('all');
-        //fetchData();
-        setShow(!show)
-    };
-
-    React.useEffect(() => {
-        fetchData();
-    }, [show,orden,asc,page]);
-
-    const clearAddForm = () => {
-        setContent('');
-        //setFlag('a');
-        setPriority('LOW');
-        setDue_date(null);
-        //fetchData();
-        //setShow(!show)
-    };
-
-    const [contentError, setContentError] = React.useState(false);
-    const [contentErrorMsg, setContentErrorMsg] = React.useState(null);
-
-    const style = {
+    // Styles
+    const style = { // Modal style
         position: 'absolute',
         top: '50%',
         left: '50%',
@@ -152,9 +47,111 @@ export default function ControlBarOrigial() {
         p: 4,
       };
 
-    const [idTodo, setIdTodo] = React.useState(null)
+    const paperStyle={ // Paper style
+        padding:'20px 20px', 
+        margin:'20px auto'
+    };
 
-    const editTodo = (id) => {
+    const Item = styled(Paper)(({ theme }) => ({ // Table items style 
+        backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+        ...theme.typography.body2,
+        padding: theme.spacing(1),
+        textAlign: 'center',
+        color: theme.palette.text.secondary,
+      }));
+
+    // Todo properties initial states
+    const [idTodo, setIdTodo] = React.useState(null)
+    const [priority, setPriority] = React.useState('LOW');
+    const [flag, setFlag] = React.useState('UNDONE');
+    const [due_date, setDue_date] = React.useState(null);
+    const[content,setContent]=React.useState('')
+
+    // Todos list
+    const[todos,setTodo]=React.useState([]) 
+
+    // Todos filter and ascending order arrows
+    const [orden, setOrden]=React.useState('default')
+    const [asc, setAsc] = React.useState(false)
+
+    const handleClickArrow = () => {
+        setAsc(!asc) // ascending or descending order button activation  
+    };
+
+    // Sort by menu
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const openmenu = Boolean(anchorEl);
+    
+    const handleClickMenu = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseMenu = () => {
+        setAnchorEl(null);
+    };
+    
+
+    // Pagination 
+    const [todosperpage, setTodosPerPage]=React.useState(10)
+    const [totalTodos, setTotalTodos] = React.useState(0)
+    const [totalpages, setTotalPages]=React.useState(1)
+    const [page, setPage]=React.useState(1)
+
+    const handlePageChange = (event, page) => {
+        setPage(page);
+    };
+
+    // Search control variables
+    const [searchpriority, setSearchPriority] = React.useState('all');
+    const [searchflag, setSearchFlag] = React.useState('all');
+    const [searchcontent, setSearchContent] = React.useState('');
+
+    const [show, setShow] = React.useState(false)
+    const showAll = () => {
+        setAsc(false)
+        setSearchContent('');
+        setSearchFlag('all');
+        setSearchPriority('all');
+        setShow(!show)
+    };
+    
+    // Priority Finish Time Average states
+    const [timeAvg, setTimeAvg] = React.useState(0)
+    const [lowTimeAvg, setLowTimeAvg] = React.useState(0)
+    const [medTimeAvg, setMedTimeAvg] = React.useState(0)
+    const [highTimeAvg, setHighTimeAvg] = React.useState(0)
+
+
+    // Add new todo - Modal
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => {console.log("modal add todo open");setOpen(true);}
+    const handleClose = () => {{setOpen(false); clearAddForm(); setContentError(false); setContentErrorMsg(null); setDue_date(null);setPriority('LOW')}};//reload();
+    
+    const clearAddForm = () => { // When clicked, restore modal form to default values
+        setContent('');
+        setPriority('LOW');
+        setDue_date(null);  
+    };
+
+    const [contentError, setContentError] = React.useState(false);
+    const [contentErrorMsg, setContentErrorMsg] = React.useState(null);
+
+    // Edit todo - Modal
+    const [openEdit, setOpenEdit] = React.useState(false);
+    const handleOpenEdit = () => {console.log("modal edit todo open");setOpenEdit(true);}
+    const handleCloseEdit = () => {{setOpenEdit(false);clearAddForm(); setContentError(false); setContentErrorMsg(null); setDue_date(null);setPriority('LOW')}};//reload();
+
+    
+    // Rendering todos list each time the show, sort, asc and/or page buttons are re-rendered
+    React.useEffect(() => {
+        fetchData();
+    }, [show,asc,orden,page]);
+
+    
+    // CONTROLLER REQUESTS
+
+    // PUT - EDIT
+    const editTodo = (id) => { 
         console.log('edit effect')
         const todo={content,priority,due_date}
         console.log(todo)
@@ -163,7 +160,6 @@ export default function ControlBarOrigial() {
             .then(fetchData)
             .then(setContentError(false))
             .then(setContentErrorMsg(null))
-            //.then(setPage)
             .catch(function (error) {
                 console.error(error);
                 setContentError(true);
@@ -171,9 +167,9 @@ export default function ControlBarOrigial() {
               })
     };
     
-    const handleClick2= (e)=>{
+    // POST - NEW TODO
+    const addNewTodo= (e)=>{
         e.preventDefault()
-        //const creationdate = new Date()
         const todo={content,priority,flag,due_date}
         console.log(todo)
         axios
@@ -181,7 +177,6 @@ export default function ControlBarOrigial() {
             .then(fetchData)
             .then(setContentError(false))
             .then(setContentErrorMsg(null))
-            //.then(setPage)
             .catch(function (error) {
                 console.error(error);
                 setContentError(true);
@@ -189,12 +184,14 @@ export default function ControlBarOrigial() {
               })
     }
 
+    // PUT - DONE/UNDONE 
     const handleDoneCheck = (id, status) => {
-        console.log('check effect')
+        console.log('status flag effect')
         const operation = status==="DONE"?"/undone":"/done"
         //setChecked(status=="DONE"?true:false)
         axios
             .put('http://localhost:9090/todos/'+String(id)+operation)
+            .then(setAsc(false))
             .then(fetchData)
             .catch(function (error) {
                 console.log('done error')
@@ -202,7 +199,7 @@ export default function ControlBarOrigial() {
               })
     };
 
-
+    // DELETE TODO
     const deleteTodo = (id) => {
         console.log('delete effect')
         axios
@@ -214,8 +211,11 @@ export default function ControlBarOrigial() {
               })
     };
 
+    // GET - SHOW TODO SELECTED PAGE
     const fetchData = () => {
-            console.log('effect')
+            
+            console.log(asc)
+            console.log('get effect')
             axios
               .get('http://localhost:9090/todos', 
               { params: 
@@ -227,11 +227,10 @@ export default function ControlBarOrigial() {
                 asc:asc } }
                 )
               .then(response => {
-                console.log('promise fulfilled')
-                //console.log(response.data.items)
+                //console.log('get promise fulfilled')
                 setTodo(response.data.items)
-                console.log(response.data.totalPages)
-                //setPage(response.data.totalPages)
+                //console.log(response.request.responseURL)
+                //console.log(response.data.totalPages)
                 setTotalTodos(response.data.totalTodos)
                 setTotalPages(response.data.totalPages)
                 setTodosPerPage(response.data.todosPerPage)
@@ -242,39 +241,32 @@ export default function ControlBarOrigial() {
     }
     
 
-    //React.useEffect(() => fetchData(), [todos]);
-
+    // GET - Average finish time for each priority group
     const fetchAvg = () => {
         console.log('avg effect')
         axios
           .get('http://localhost:9090/todos/avg')
           .then(response => {
             console.log('avg promise fulfilled')
-            //console.log(response.data.items)
             setTimeAvg(response.data["GLOBAL"])
             setLowTimeAvg(response.data["LOW"])
             setMedTimeAvg(response.data["MEDIUM"])
             setHighTimeAvg(response.data["HIGH"])
-            //console.log(response.data.totalPages)
-            //setPage(response.data.totalPages)
           })
           .catch(function (error) {
             console.error(error);
           })
     }
 
+    // GET average effect will be performed each time the todos list is re-rendered
     React.useEffect(() => fetchAvg(), [todos]);
 
-    const Item = styled(Paper)(({ theme }) => ({
-        backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-        ...theme.typography.body2,
-        padding: theme.spacing(1),
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
-      }));
-
+    
     return (
         <Container>
+
+        {/* Search Control Bar */}
+
         <Paper sx={{ my: 2, maxWidth: 750  }} style={paperStyle} >
             {/*<h1 style={{color:"blue"}}>Search Todo</h1>*/}
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -332,6 +324,8 @@ export default function ControlBarOrigial() {
             </Container>
         </Paper>
 
+    {/* Sorting view */}
+
     <Container  style={{display:'flex', justifyContent:'space-between'}}>
         <div style={{margin:'0'}}>
         <Button size='small' align="left" variant="contained"  onClick={handleOpen}>+ Add Todo</Button>
@@ -364,7 +358,8 @@ export default function ControlBarOrigial() {
       </Menu>
     
         <IconButton
-            onClick={handleClickArrow}>
+            onClick={handleClickArrow}
+            >
             <ImportExportIcon></ImportExportIcon>
         </IconButton>
         </div>
@@ -373,7 +368,7 @@ export default function ControlBarOrigial() {
     </Container>
 
 
-        {/*<p align="left">Total todos: {totalTodos}</p>*/}
+        {/*Add new todo Modal*/}
         
         <Modal
             open={open}
@@ -426,6 +421,7 @@ export default function ControlBarOrigial() {
                 <DateTimePicker sx={{ my: 2 }}
                     renderInput={(params) => <TextField {...params} />} // sx={{width: '35%'}}
                     label="Due Date (Optional)"
+                    
                     //format="dd/MM/yyyy"
                     value={due_date}
                     onChange={(newValue) => {
@@ -434,7 +430,11 @@ export default function ControlBarOrigial() {
                     }}
                     //renderInput={(params) => <TextField {...params} helperText="Optional"/>}
                 />
+                <IconButton  onClick={async() => {await setDue_date(null)}} style={{margin:'8px 5px'}}>
+                    <ClearIcon></ClearIcon>
+                 </IconButton>
             </div>
+            
             
             </LocalizationProvider>
             
@@ -446,7 +446,7 @@ export default function ControlBarOrigial() {
         
             <Button variant="contained" 
             onClick={
-                handleClick2
+                addNewTodo
               }
             >Add New Todo</Button>
             <Button variant="contained" 
@@ -458,6 +458,7 @@ export default function ControlBarOrigial() {
         </Box>
         </Modal>
 
+    {/* Edit Todo Modal */}
         <Modal
             //key={todo.id}
             open={openEdit}
@@ -518,6 +519,9 @@ export default function ControlBarOrigial() {
                     }}
                     //renderInput={(params) => <TextField {...params} helperText="Optional"/>}
                 />
+                <IconButton  onClick={async() => {await setDue_date(null)}} style={{margin:'8px 5px'}}>
+                    <ClearIcon></ClearIcon>
+                 </IconButton>
             </div>
             
             </LocalizationProvider>
@@ -535,6 +539,8 @@ export default function ControlBarOrigial() {
                 </Container>   
                 </Box>
         </Modal>
+
+        {/* Todos table */}
         
         <TableContainer component={Paper} sx={{ my: 2}} style={{}}>
         <Table  size="small" aria-label="a dense table">  
@@ -592,12 +598,10 @@ export default function ControlBarOrigial() {
                 </TableRow>
             ))}
             </TableBody>
-            
-            
-            
-
         </Table>
         </TableContainer>
+
+        {/* Pagination */}
         <Container style={{ display: "flex", justifyContent: 'space-between' }}>
             Todos per page: {todosperpage}
             <Pagination count={totalpages} page={page} onChange={handlePageChange} />
@@ -605,7 +609,7 @@ export default function ControlBarOrigial() {
         </Container>
            
 
-        
+        {/* Finish Time Metrics */}
         <Paper component={Paper} sx={{ my: 2  }} style={{ display: "flex", justifyContent: "space-around" }}>
         <div style={{textAlign:'left'}}>
         <br/>Average time to finish tasks:<br/><br/><br/>
@@ -619,36 +623,6 @@ export default function ControlBarOrigial() {
         </div>
     
         </Paper>
-            
-
-
-
-
-
-        {/*<Paper style={{padding:'20px 20px', width:600,margin:"20px auto"}}>
-        <h1>Todo's List</h1>
-
-        
-
-        {todos.map(todo=>(
-            <Paper elevation={6} style={{margin:"10px",padding:"15px", textAlign:"left"}} key={todo.id}>
-            Id:{todo.id}<br/>
-            Content:{todo.content}<br/>
-            Done:{todo.flag}<br/>
-            Priority:{todo.priority}<br/>
-            Creation Date:{todo.creation_date}<br/>
-            Due Date:{todo.due_date}<br/>
-            Due Date:{duedate}<br/>
-            Done Date:{todo.done_date}
-
-            </Paper>
-        
-        ))
-    }
-
-
-        
-</Paper>*/}
         </Container>
     );
   }
