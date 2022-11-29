@@ -316,11 +316,11 @@ export default function TodoApplication() {
             </LocalizationProvider>
             <Container style={{padding:'15px 0px 0px 0px', justifyContent:'space-around', display:'flex'}}>
             <Button size='small' variant="contained"  style={{}}
-            onClick={
-                fetchData
+            onClick={() => {fetchData(); setPage(1)}
+                
               }
             >Search Todo</Button>  
-            <Button size='small' align="left" variant="contained"  onClick={showAll}>Show All</Button>         
+            <Button size='small' align="left" variant="contained"  onClick={() => {showAll(); setPage(1)}}>Show All</Button>         
             </Container>
         </Paper>
 
