@@ -220,7 +220,7 @@ export default function TodoApplication() {
               .get('http://localhost:9090/todos', 
               { params: 
               { orden: orden, 
-                content:searchcontent, 
+                content:searchcontent.toLowerCase(), 
                 page : page, 
                 flag: searchflag, 
                 priority:searchpriority, 
@@ -229,7 +229,7 @@ export default function TodoApplication() {
               .then(response => {
                 //console.log('get promise fulfilled')
                 setTodo(response.data.items)
-                //console.log(response.request.responseURL)
+                console.log(response.request.responseURL)
                 //console.log(response.data.totalPages)
                 setTotalTodos(response.data.totalTodos)
                 setTotalPages(response.data.totalPages)
